@@ -5,8 +5,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 function GeneroForm() {
     const [nombre, setNombre] = useState('');
     const [descripcion, setDescripcion] = useState('');
-    // Campos extra del modelo Genero
     const [popularidad, setPopularidad] = useState(0); 
+    const [icono, setIcono] = useState(null);
     
     const navigate = useNavigate();
     const { id } = useParams();
@@ -16,7 +16,7 @@ function GeneroForm() {
             apiClient.get(`/generos/${id}/`).then(response => {
                 const g = response.data;
                 setNombre(g.nombre);
-                setDescripcion(g.descripcion);
+                setDescripcion(g.descripcion || '');
                 setPopularidad(g.popularidad || 0);
             }).catch(error => console.error(error));
         }
@@ -24,19 +24,19 @@ function GeneroForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Aquí no usamos FormData porque no hay archivos
-        const data = {
-            nombre,
-            descripcion,
-            popularidad
-        };
+        const formData = new FormData();
+        // ... (resto de la lógica de FormData)
+        formData.append('nombre', nombre);
+        formData.append('descripcion', descripcion);
+        formData.append('popularidad', popularidad);
+        if (icono) formData.append('icono', icono);
 
         try {
+            const config = { headers: { 'Content-Type': 'multipart/form-data' } };
             if (id) {
-                await apiClient.put(`/generos/${id}/`, data);
+                await apiClient.patch(`/generos/${id}/`, formData, config);
             } else {
-                await apiClient.post('/generos/', data);
+                await apiClient.post('/generos/', formData, config);
             }
             navigate('/generos');
         } catch (error) {
@@ -45,31 +45,53 @@ function GeneroForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 border rounded-lg shadow-md bg-white">
-            <h1 className="text-2xl font-bold mb-6">{id ? "Editar Género" : "Nuevo Género"}</h1>
+        // Contenedor del formulario
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-8 bg-white rounded-xl shadow-2xl space-y-6">
+            <h1 className="text-3xl font-bold text-slate-900">{id ? "Editar Género" : "Nuevo Género"}</h1>
             
-            <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} required 
-                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" />
+            {/* Campo Nombre */}
+            <div>
+                <label htmlFor="nombre" className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
+                <input 
+                    type="text" id="nombre" value={nombre} onChange={e => setNombre(e.target.value)} required 
+                    className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" />
             </div>
             
-            <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Descripción</label>
-                <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)}
-                          rows="3"
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" />
+            {/* Campo Descripción */}
+            <div>
+                <label htmlFor="descripcion" className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+                <textarea 
+                    id="descripcion" value={descripcion} onChange={e => setDescripcion(e.target.value)}
+                    rows="4"
+                    className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" />
             </div>
 
-            <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700">Popularidad</label>
-                <input type="number" value={popularidad} onChange={e => setPopularidad(e.target.value)}
-                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500" />
+            {/* Campo Popularidad */}
+            <div>
+                <label htmlFor="popularidad" className="block text-sm font-medium text-slate-700 mb-1">Popularidad</label>
+                <input 
+                    type="number" id="popularidad" value={popularidad} onChange={e => setPopularidad(e.target.value)}
+                    className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" />
             </div>
 
-            <button type="submit" className="w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 font-medium">
-                Guardar Género
-            </button>
+            {/* Campo de Archivo (Icono) */}
+            <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Icono del Género</label>
+                <input 
+                    type="file" 
+                    onChange={e => setIcono(e.target.files[0])}
+                    className="mt-1 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-colors" />
+            </div>
+
+            {/* Botón de Enviar */}
+            <div className="pt-4">
+                <button 
+                    type="submit" 
+                    className="w-full flex justify-center bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-indigo-700 transition-colors duration-200 font-medium"
+                >
+                    Guardar Género
+                </button>
+            </div>
         </form>
     );
 }

@@ -30,27 +30,47 @@ function GenerosList() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Lista de Géneros</h1>
-            <Link to="/generos/nuevo" className="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block hover:bg-blue-600">
-                Añadir Género
-            </Link>
+        <div className="max-w-3xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900">Géneros</h1>
+                <Link 
+                    to="/generos/nuevo" 
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors duration-200"
+                >
+                    Añadir Género
+                </Link>
+            </div>
 
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                <ul className="divide-y divide-gray-200">
+            <div className="bg-white shadow-xl rounded-lg overflow-hidden">
+                <ul className="divide-y divide-slate-200">
                     {generos.map(genero => (
-                        <li key={genero.id} className="p-4 flex justify-between items-center">
-                            <div>
-                                <p className="text-lg font-medium text-gray-900">{genero.nombre}</p>
-                                <p className="text-sm text-gray-500">{genero.descripcion}</p>
+                        // Item de lista responsive
+                        <li key={genero.id} className="p-4 sm:p-6 flex flex-col sm:flex-row justify-between sm:items-center">
+                            <div className="flex items-center mb-4 sm:mb-0">
+                                {genero.icono ? (
+                                    <img 
+                                        src={genero.icono} 
+                                        alt={genero.nombre} 
+                                        className="w-16 h-16 rounded-lg mr-4 object-cover flex-shrink-0"
+                                    />
+                                ) : (
+                                    <div className="w-16 h-16 rounded-lg mr-4 bg-slate-200 flex-shrink-0"></div>
+                                )}
+                                <div>
+                                    <p className="text-lg font-semibold text-slate-800">{genero.nombre}</p>
+                                    <p className="text-sm text-slate-600 truncate max-w-xs">{genero.descripcion}</p>
+                                </div>
                             </div>
-                            <div className="flex space-x-2">
-                                <Link to={`/generos/editar/${genero.id}`} className="text-sm bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                            <div className="flex space-x-3 self-end sm:self-auto">
+                                <Link 
+                                    to={`/generos/editar/${genero.id}`} 
+                                    className="text-sm bg-amber-500 text-white px-3 py-1 rounded-md shadow-sm hover:bg-amber-600 transition-colors"
+                                >
                                     Editar
                                 </Link>
                                 <button 
                                     onClick={() => handleEliminar(genero.id)}
-                                    className="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                                    className="text-sm bg-red-600 text-white px-3 py-1 rounded-md shadow-sm hover:bg-red-700 transition-colors"
                                 >
                                     Eliminar
                                 </button>
